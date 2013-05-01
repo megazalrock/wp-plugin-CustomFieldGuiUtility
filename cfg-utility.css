@@ -112,7 +112,34 @@ div.radio p.cfg_input {
 	display: inline;
 }
 
+div.table textarea{
+	width:45%;
+	height:6em;
+}
+
 /* exValidation */
 form#post .err {
     background-color: #FFC8C5 !important;
 }
+/* table */
+.table .addBtn,.table .deleteBtn{
+	cursor:pointer;
+}
+.table .addBtn{
+	height:18px;
+	vertical-align:middle;
+	display:table-cell;
+}
+.table .addBtn img{
+	vertical-align:middle;
+}
+/* date */
+.date .radioBox label{
+	display:inline-block;
+	padding:0 1em 0 0.5em;
+	
+}
+div.date inside div.dateBox{
+	
+}
+

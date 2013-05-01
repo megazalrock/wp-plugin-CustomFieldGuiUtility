@@ -213,6 +213,12 @@ function insert_gui ($obj) {
             $out .= make_textarea($param);
         } elseif ($data_type == 'hr') {
             $out .= make_hr($param);
+        } elseif ($data_type == 'table'){
+        	$out .= make_table($param);
+        } elseif ($data_type == 'date'){
+        	$out .= make_date($param);
+        } elseif ($data_type == 'simpledate'){
+        	$out .= make_simpledate($param);
         }
     }
     echo $out;
@@ -512,6 +518,167 @@ function make_hr($param) {
     return '<h5 class="postbox_hr ' . $class . '">' . $fieldname . '</h5>';
 }
 
+/* テーブル入力用のフォームを生成する */
+function make_table($param){
+	
+	$post_id    = $param['post_id'];
+	$meta_key   = $param['meta_key'];
+	$type       = $param['type'];
+	$class      = $param['class'];
+	$default    = $param['default'];
+	$sample     = $param['sample'];
+	$fieldname  = $param['fieldname'];
+	$must       = $param['must'];
+	$rows       = $param['rows'];
+	$cols       = $param['cols'];
+	$validation = $param['validation'];
+	
+	$name = 'cfg_' . sanitize_name($meta_key);
+	$meta_value = get_post_meta($post_id, $meta_key, true);
+	
+	if (!empty($meta_value)) {
+		$value = esc_attr($meta_value);
+	} else {
+		$value = esc_attr($default);
+	}
+	
+	$image_dir_path = get_bloginfo('wpurl') . '/wp-content/plugins/lattice/custom-field-gui-utility/images/';
+	
+    $inside = <<< EOF
+    	<div class="data" id="{$name}_table">
+    		<div class="line"><span class="deleteBtn"><img src="{$image_dir_path}remove.png"></span><span><textarea class="key"></textarea></th><td><textarea class="value"></textarea></span></div>
+    		<div><span class="addBtn" colspan="3"><img src="{$image_dir_path}add.png"> 追加する</span></div>
+    	</div>
+    	<input type="hidden" class="tableValue" id="{$name}" name="{$name}" value="{$value}" data-imgpath="{$image_dir_path}" />
+EOF;
+	
+	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+	return $out;
+}
+
+/* 日付入力用のフォームを生成する */
+function make_date($param){
+
+	$post_id    = $param['post_id'];
+	$meta_key   = $param['meta_key'];
+	$type       = $param['type'];
+	$class      = $param['class'];
+	$default    = $param['default'];
+	$sample     = $param['sample'];
+	$fieldname  = $param['fieldname'];
+	$must       = $param['must'];
+	$rows       = $param['rows'];
+	$cols       = $param['cols'];
+	$validation = $param['validation'];
+    $size		= $param['size'];
+    $halfsize	= $param['size']/2;
+
+	$name = 'cfg_' . sanitize_name($meta_key);
+	$meta_value = get_post_meta($post_id, $meta_key, true);
+	
+	$meta_value_start_date = get_post_meta($post_id, $meta_key.'_start_date', true);
+	$meta_value_start_hour = get_post_meta($post_id, $meta_key.'_start_hour', true);
+	$meta_value_start_minutes = get_post_meta($post_id, $meta_key.'_start_minutes', true);
+	
+	$meta_value_end_date = get_post_meta($post_id, $meta_key.'_end_date', true);
+	$meta_value_end_hour = get_post_meta($post_id, $meta_key.'_end_hour', true);
+	$meta_value_end_minutes = get_post_meta($post_id, $meta_key.'_end_minutes', true);
+
+	/* if (!empty($meta_value)) {
+		$value = esc_attr($meta_value);
+	} else {
+		$value = esc_attr($default);
+	} */
+	
+	if(empty($default) || !isset($default)){
+		$default = 'visible';
+	}
+	
+	$checked_array = array(
+		'hidden' => '',
+		'visible' => '',
+		'timer'=> ''
+	);
+	
+	if(!empty($meta_value)){
+		$checked_array[$meta_value] = ' checked = "checked"';
+	}else{
+		$checked_array[$default] = ' checked = "checked"';
+	}
+
+	$inside = <<< EOF
+		<div class="radioBox">
+			<input type="radio" id="{$name}_radio1" name="{$name}" value="hidden"{$checked_array['hidden']} ><label for="{$name}_radio1">非表示</label>
+			<input type="radio" id="{$name}_radio2" name="{$name}" value="visible"{$checked_array['visible']} ><label for="{$name}_radio2">表示</label>
+			<input type="radio" id="{$name}_radio3" name="{$name}" value="timer"{$checked_array['timer']} ><label for="{$name}_radio3">タイマー設定</label>
+		</div>
+		<div class="dateBox">
+			表示開始日時
+	    	<input type="date" size="{$halfsize}" class="date" id="{$name}_start_date" name="{$name}_start_date" value="{$meta_value_start_date}" />
+	    	<input type="number" max="23" min="0" size="{$halfsize}" class="date" id="{$name}_start_hour" name="{$name}_start_hour" value="{$meta_value_start_hour}" />時
+	    	<input type="number" max="59" min="0" size="{$halfsize}" class="date" id="{$name}_start_minutes" name="{$name}_start_minutes" value="{$meta_value_start_minutes}" />分
+	    	<br />
+	    	表示終了日時
+	    	<input type="date" size="{$halfsize}" class="date" id="{$name}_end_date" name="{$name}_end_date" value="{$meta_value_end_date}" />
+	    	<input type="number" max="23" min="0" size="{$halfsize}" class="date" id="{$name}_end_hour" name="{$name}_end_hour" value="{$meta_value_end_hour}" />時
+	    	<input type="number" max="59" min="0" size="{$halfsize}" class="date" id="{$name}_end_minutes" name="{$name}_end_minutes" value="{$meta_value_end_minutes}" />分
+		</div>
+EOF;
+
+	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+	return $out;
+}
+
+/*日付入力用のやつ*/
+function make_simpledate($param){
+
+	$post_id    = $param['post_id'];
+	$meta_key   = $param['meta_key'];
+	$type       = $param['type'];
+	$class      = $param['class'];
+	$default    = $param['default'];
+	$sample     = $param['sample'];
+	$fieldname  = $param['fieldname'];
+	$must       = $param['must'];
+	$rows       = $param['rows'];
+	$cols       = $param['cols'];
+	$validation = $param['validation'];
+	$size		= $param['size'];
+	$halfsize	= $param['size']/2;
+	
+	$name = 'cfg_' . sanitize_name($meta_key);
+	$meta_value = get_post_meta($post_id, $meta_key, true);
+	
+	
+	/* if (!empty($meta_value)) {
+	 $value = esc_attr($meta_value);
+	} else {
+	$value = esc_attr($default);
+	} */
+	
+	if(empty($default) || !isset($default)){
+		$default = '';
+	}
+	
+	/*$checked_array = array(
+			'hidden' => '',
+			'visible' => '',
+			'timer'=> ''
+	);
+	
+	if(!empty($meta_value)){
+		$checked_array[$meta_value] = ' checked = "checked"';
+	}else{
+		$checked_array[$default] = ' checked = "checked"';
+	}*/
+	
+	$inside = <<< EOF
+		<input type="date" size="{$size}" class="date" id="{$name}" name="{$name}" value="{$meta_value}" />
+EOF;
+	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+	return $out;
+};
+
 function edit_meta_value($post_id) {
     if ($post_id == 0) {
         return $post_id;
@@ -535,25 +702,84 @@ function edit_meta_value($post_id) {
         if ($data_type == 'hr' or $meta_key == 'cfgu_setting') {
             continue;
         }
-        $meta_value = isset($_REQUEST["$name"]) ? stripslashes(trim($_REQUEST["$name"])): '';
-        if (isset($meta_value) && !empty($meta_value)) {
-            delete_post_meta($post_id, $meta_key);
-            if ($data_type == 'textfield' ||
-                $data_type == 'imagefield' ||
-                $data_type == 'filefield' ||
-                $data_type == 'multi_checkbox' ||
-                $data_type == 'radio'  ||
-                $data_type == 'select' ||
-                $data_type == 'textarea') {
-                add_post_meta($post_id, $meta_key, $meta_value);
-            } elseif ($data['type'] == 'checkbox') {
-                add_post_meta($post_id, $meta_key, 'true');
-            }
-        } elseif (isset($meta_value) && strval($meta_value) === '0') {
-            add_post_meta($post_id, $meta_key, '0');
-        } else {
-            delete_post_meta($post_id, $meta_key);
+        if($data_type == 'simpledate'){
+        	$meta_value = isset($_REQUEST["$name"]) ? stripslashes(trim($_REQUEST["$name"])): '';
+        	if (isset($meta_value) && !empty($meta_value)) {
+        		$meta_value_unixtime = strtotime($meta_value);
+        		delete_post_meta($post_id, $meta_key.'_unixtime');
+        		delete_post_meta($post_id, $meta_key);
+        		add_post_meta($post_id, $meta_key.'_unixtime', $meta_value_unixtime);
+        		add_post_meta($post_id, $meta_key, $meta_value);
+        	} elseif (isset($meta_value) && strval($meta_value) === '0') {
+        		add_post_meta($post_id, $meta_key.'_unixtime', '0');
+        		add_post_meta($post_id, $meta_key, '0');
+        	} else {
+        		delete_post_meta($post_id, $meta_key.'_unixtime');
+        		delete_post_meta($post_id, $meta_key);
+        	}
+        }else if($data_type == 'date'){
+        	$start_datetime = array(
+       			"$meta_key".'_start_date' => isset($_REQUEST["$name".'_start_date']) ? stripslashes(trim($_REQUEST["$name".'_start_date'])): '',
+        		"$meta_key".'_start_hour' => isset($_REQUEST["$name".'_start_hour']) ? stripslashes(trim($_REQUEST["$name".'_start_hour'])): '',
+        		"$meta_key".'_start_minutes' => isset($_REQUEST["$name".'_start_minutes']) ? stripslashes(trim($_REQUEST["$name".'_start_minutes'])): ''
+        	);
+        	$end_datetime = array(
+        		"$meta_key".'_end_date' => isset($_REQUEST["$name".'_end_date']) ? stripslashes(trim($_REQUEST["$name".'_end_date'])): '',
+        		"$meta_key".'_end_hour' => isset($_REQUEST["$name".'_end_hour']) ? stripslashes(trim($_REQUEST["$name".'_end_hour'])): '',
+      			"$meta_key".'_end_minutes' => isset($_REQUEST["$name".'_end_minutes']) ? stripslashes(trim($_REQUEST["$name".'_end_minutes'])): ''
+        	);
+        	$meta_value = $meta_value = isset($_REQUEST["$name"]) ? stripslashes(trim($_REQUEST["$name"])): '';
+        	
+        	foreach ($start_datetime as $key => $value){
+        		if(isset($value) && $value !== ''){
+        			delete_post_meta($post_id, $key);
+        			add_post_meta($post_id, $key, $value);
+        		}else if(!isset($value) || $value === ''){
+        			delete_post_meta($post_id, $key);
+        		}
+        	}
+        	foreach ($end_datetime as $key => $value){
+        		if(isset($value) && $value !== ''){
+        			delete_post_meta($post_id, $key);
+        			add_post_meta($post_id, $key, $value);
+        		}else if(!isset($value) || $value === ''){
+        			delete_post_meta($post_id, $key);
+        		}
+        	}
+        	
+        	if(isset($meta_value)){
+        		delete_post_meta($post_id, $meta_key);
+        		add_post_meta($post_id, $meta_key, $meta_value);
+        	}else{
+        		delete_post_meta($post_id, $meta_key);
+        	}
+        	
+        }else{
+        	$meta_value = isset($_REQUEST["$name"]) ? stripslashes(trim($_REQUEST["$name"])): '';
+        	
+        	if (isset($meta_value) && !empty($meta_value)) {
+        		delete_post_meta($post_id, $meta_key);
+        		if ($data_type == 'textfield' ||
+        				$data_type == 'imagefield' ||
+        				$data_type == 'filefield' ||
+        				$data_type == 'multi_checkbox' ||
+        				$data_type == 'radio'  ||
+        				$data_type == 'select' ||
+        				$data_type == 'table' ||
+        				$data_type == 'textarea' ||
+        				$data_type == 'simpledate') {
+        			add_post_meta($post_id, $meta_key, $meta_value);
+        		} elseif ($data['type'] == 'checkbox') {
+        			add_post_meta($post_id, $meta_key, 'true');
+        		}
+        	} elseif (isset($meta_value) && strval($meta_value) === '0') {
+        		add_post_meta($post_id, $meta_key, '0');
+        	} else {
+        		delete_post_meta($post_id, $meta_key);
+        	}
         }
+        
+       
     }
 }
 
