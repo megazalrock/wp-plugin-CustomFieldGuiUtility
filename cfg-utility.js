@@ -286,5 +286,73 @@ jQuery(function($){
 
     // for facebox.js
     $("a[rel*=facebox]").facebox();
+    
+    $('div.postbox.table > div.inside')
+	  .each(function(){
+			var $_inside = $(this);
+			
+			var $_add = $(this).find('span.addBtn');
+			
+			var $_hidden = $(this).children('input.tableValue');
+			var imagePath = $_hidden.attr('data-imgpath');
+			
+			if($_hidden.val()){
+				var html = '';
+				var lineArr = $_hidden.val().split('|');
+				for(var i=0;i < lineArr.length;i++){
+					
+					lineArr[i] = lineArr[i].split(' ');
+					for(var j=0;j < lineArr[i].length;j++){
+						lineArr[i][j] = decodeURI(lineArr[i][j]);
+					}
+					html += '<div class="line">';
+					html += '<span class="deleteBtn"><img src="'+imagePath+'remove.png"></span>';
+					html += '<span><textarea class="key">' + lineArr[i][0] + '</textarea></span>';
+					html += '<span><textarea class="value">' + lineArr[i][1] + '</textarea></span>';
+					html += '</div>';
+				}
+				$(this).find('div.line').remove();
+				$_add.before(html);
+			}
+			
+			$(this).on('click','span.deleteBtn',function(){
+				$(this).parent().slideUp('fast',function(){
+					$(this).remove();
+					updateTableValue();
+				});
+			});
+			$(this).on('blur keypress keyup','textarea',function(){
+				updateTableValue();
+			});
+			
+			$_add
+				.click(function(){
+					$_newLine = $('<div class="line"><span class="deleteBtn"><img src="'+ imagePath +'remove.png"></span><span><textarea class="key"></textarea></span><span><textarea class="value"></textarea></span></div>');
+					$_newLine.css('display','none');
+					$(this).parent().find('span.addBtn').before($_newLine);
+					$_newLine.slideDown('fast');
+					updateTableValue();
+				});
+			function updateTableValue(){
+				var tableValue = new Array();
+				$_inside.find('div.line')
+					.each(function(n){
+						var key = $(this).find('textarea.key').val();
+						var value = $(this).find('textarea.value').val();
+						key = key || '';
+						value = value || '';
+						var key_encoded = encodeURI(key);
+						var value_encoded = encodeURI(value);
+						if(key || value){
+							tableValue[n] = key_encoded +' '+value_encoded;
+						}
+					});
+				var tableStr = tableValue.join('|');
+				if(tableStr === undefined){
+					tableStr = '';
+				}
+				$_hidden.val(tableStr);
+			}
+		});
 
 });

@@ -52,6 +52,12 @@ add_action('publish_post', 'edit_meta_value');
 /* transition_post_status : 記事・ページが公開された際、またはステータスが「公開」に変更された場合に実行する。 */
 add_action('transition_post_status', 'edit_meta_value');
 
+/* jQueryのバージョンを1.9に変更 */
+wp_deregister_script('jquery');
+wp_enqueue_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', array(), '1.9.1');
+wp_enqueue_script('jquery-ui','http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js',array('jquery'),'1.10.3');
+wp_enqueue_script('jquery-migrate','http://code.jquery.com/jquery-migrate-1.1.1.min.js',array('jquery'),'1.1.1');
+
 /******************
    Functions(main)
  ******************/
@@ -541,9 +547,10 @@ function make_table($param){
 	} else {
 		$value = esc_attr($default);
 	}
-	
+
 	$current_dir = basename(dirname(__FILE__));
-	$image_dir_path = get_bloginfo('wpurl') . '/wp-content/plugins/' . $current_dir . '/';
+	$plugin_url = get_bloginfo('wpurl') . '/wp-content/plugins/' . $current_dir . '/';
+	$image_dir_path = $plugin_url.'images/';
 	
     $inside = <<< EOF
     	<div class="data" id="{$name}_table">
