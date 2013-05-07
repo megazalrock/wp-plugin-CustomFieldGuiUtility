@@ -54,7 +54,7 @@ add_action('transition_post_status', 'edit_meta_value');
 
 /* jQueryのバージョンを1.9に変更 */
 wp_deregister_script('jquery');
-wp_enqueue_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', array(), '1.9.1');
+wp_enqueue_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js', array(), '1.9.1');
 wp_enqueue_script('jquery-ui','http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js',array('jquery'),'1.10.3');
 wp_enqueue_script('jquery-migrate','http://code.jquery.com/jquery-migrate-1.1.1.min.js',array('jquery'),'1.1.1');
 
@@ -74,14 +74,7 @@ function insert_head () {
     var current_dir = "{$current_dir}";
     </script>
     <script type="text/javascript" src="{$plugin_url}facebox/facebox.js"></script>
-    <script type="text/javascript" src="{$plugin_url}exValidation/js/exvalidation.js"></script>
-    <script type="text/javascript" src="{$plugin_url}exValidation/js/exchecker-ja.js"></script>
     <script type="text/javascript" src="{$plugin_url}cfg-utility.js"></script>
-    <script type="text/javascript">
-    jQuery(function($){
-        $("form#post").exValidation();
-    });
-    </script>
 EOD;
     echo $head;
 }
