@@ -32,6 +32,10 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+
+$current_dir = basename(dirname(__FILE__));
+$plugin_url = get_bloginfo('wpurl') . '/wp-content/plugins/' . $current_dir . '/';
+
 require_once (ABSPATH . 'wp-admin/includes/template.php');
 
 // 管理画面にエディタ機能を追加
@@ -55,7 +59,7 @@ add_action('transition_post_status', 'edit_meta_value');
 /* jQueryのバージョンを1.9に変更 */
 wp_deregister_script('jquery');
 wp_enqueue_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js', array(), '1.9.1');
-wp_enqueue_script('jquery-ui','http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js',array('jquery'),'1.10.3');
+wp_enqueue_script('jquery-ui',$plugin_url.'jquery-ui/js/jquery-ui-1.10.3.custom.js',array('jquery'),'1.10.3');
 wp_enqueue_script('jquery-migrate','http://code.jquery.com/jquery-migrate-1.1.1.min.js',array('jquery'),'1.1.1');
 
 /******************
@@ -67,9 +71,36 @@ function insert_head () {
     $current_dir = basename(dirname(__FILE__));
     $plugin_url = get_bloginfo('wpurl') . '/wp-content/plugins/' . $current_dir . '/';
     $head = <<< EOD
+    
+    <link rel="stylesheet" href="{$plugin_url}jquery-ui/css/smoothness/jquery-ui-1.10.3.custom.css" type="text/css" media="all" />
     <link rel="stylesheet" href="{$plugin_url}facebox/facebox.css" type="text/css" media="all" />
     <link rel="stylesheet" href="{$plugin_url}cfg-utility.css" type="text/css" media="all" />
     <link rel="stylesheet" href="{$plugin_url}exValidation/css/exvalidation.css" type="text/css" />
+    <style>
+    	.ui-multi-selected > *{
+    		border-color:#00F !important;
+    	}
+    	.datepicker_box{
+    		overflow:hidden;
+    	}
+    	.datepicker_box .datepicker{
+    		float:left;
+    		margin-right:10px;
+		}
+		.datepicker_box .datepicker_list{
+			height:182px;
+			width:300px;
+			margin:0;
+			overflow:auto;
+			background:#FFF;
+			padding:5px 0 5px 30px;
+			list-style:inside desc;
+		}
+		.datepicker_box .datepicker_list li{
+		}
+		.datepicker_box .datepicker_list li:last-child{
+		}
+    </style>
     <script type="text/javascript">
     var current_dir = "{$current_dir}";
     </script>
@@ -218,6 +249,8 @@ function insert_gui ($obj) {
         	$out .= make_date($param);
         } elseif ($data_type == 'simpledate'){
         	$out .= make_simpledate($param);
+        } elseif ($data_type == 'datearray'){
+        	$out .= make_datearray($param);
         }
     }
     echo $out;
@@ -650,31 +683,50 @@ function make_simpledate($param){
 	$name = 'cfg_' . sanitize_name($meta_key);
 	$meta_value = get_post_meta($post_id, $meta_key, true);
 	
-	
-	/* if (!empty($meta_value)) {
-	 $value = esc_attr($meta_value);
-	} else {
-	$value = esc_attr($default);
-	} */
-	
 	if(empty($default) || !isset($default)){
 		$default = '';
 	}
-	
-	/*$checked_array = array(
-			'hidden' => '',
-			'visible' => '',
-			'timer'=> ''
-	);
-	
-	if(!empty($meta_value)){
-		$checked_array[$meta_value] = ' checked = "checked"';
-	}else{
-		$checked_array[$default] = ' checked = "checked"';
-	}*/
+
 	
 	$inside = <<< EOF
 		<input type="date" size="{$size}" class="date" id="{$name}" name="{$name}" value="{$meta_value}" />
+EOF;
+	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+	return $out;
+};
+
+/* 日付の配列 */
+function make_datearray($param){
+
+	$post_id    = $param['post_id'];
+	$meta_key   = $param['meta_key'];
+	$type       = $param['type'];
+	$class      = $param['class'];
+	$default    = $param['default'];
+	$sample     = $param['sample'];
+	$fieldname  = $param['fieldname'];
+	$must       = $param['must'];
+	$rows       = $param['rows'];
+	$cols       = $param['cols'];
+	$validation = $param['validation'];
+	$size		= $param['size'];
+	$halfsize	= $param['size']/2;
+
+	$name = 'cfg_' . sanitize_name($meta_key);
+	$meta_value = get_post_meta($post_id, $meta_key, true);
+
+	if(empty($default) || !isset($default)){
+		$default = '';
+	}
+
+	$inside = <<< EOF
+		<div class="datepicker_box">
+			<div class="datepicker" id="{$name}_datepicker"></div>
+			<ol class="datepicker_list">
+				<li>日付を選択して下さい。</li>
+			</ol>
+			<input type="hidden" class="datearray_hidden" id="{$name}" name="{$name}" value="{$meta_value}">
+		</div>
 EOF;
 	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
 	return $out;
@@ -768,7 +820,8 @@ function edit_meta_value($post_id) {
         				$data_type == 'select' ||
         				$data_type == 'table' ||
         				$data_type == 'textarea' ||
-        				$data_type == 'simpledate') {
+        				$data_type == 'simpledate' ||
+        				$data_type == 'datearray') {
         			add_post_meta($post_id, $meta_key, $meta_value);
         		} elseif ($data['type'] == 'checkbox') {
         			add_post_meta($post_id, $meta_key, 'true');
