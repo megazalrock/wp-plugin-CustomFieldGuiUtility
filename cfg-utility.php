@@ -542,7 +542,8 @@ function make_table($param){
 		$value = esc_attr($default);
 	}
 	
-	$image_dir_path = get_bloginfo('wpurl') . '/wp-content/plugins/custom-field-gui-utility/images/';
+	$current_dir = basename(dirname(__FILE__));
+	$image_dir_path = get_bloginfo('wpurl') . '/wp-content/plugins/' . $current_dir . '/';
 	
     $inside = <<< EOF
     	<div class="data" id="{$name}_table">
