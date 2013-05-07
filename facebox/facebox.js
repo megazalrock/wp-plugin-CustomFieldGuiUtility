@@ -75,7 +75,7 @@
    * Public, jQuery.facebox methods
    */
 	var admin_url = location.href;
-	var facebox_url = admin_url.replace(/(http.+)(wp-admin)(.+)/,'$1') + 'wp-content/plugins/lattice/custom-field-gui-utility/facebox/';
+	var facebox_url = admin_url.replace(/(http.+)(wp-admin)(.+)/,'$1') + 'wp-content/plugins/cfg-utility/facebox/';
 
   jQuery.extend(jQuery.facebox, {
     settings: {
