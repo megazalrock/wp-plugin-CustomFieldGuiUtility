@@ -60,6 +60,7 @@ add_action('transition_post_status', 'edit_meta_value');
 wp_deregister_script('jquery');
 wp_enqueue_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js', array(), '1.9.1');
 wp_enqueue_script('jquery-ui',$plugin_url.'jquery-ui/js/jquery-ui-1.10.3.custom.js',array('jquery'),'1.10.3');
+wp_enqueue_script('jquery-validate.js',$plugin_url.'jquery.validate.min.js',array('jquery'),'1.11.1');
 wp_enqueue_script('jquery-migrate','http://code.jquery.com/jquery-migrate-1.1.1.min.js',array('jquery'),'1.1.1');
 
 /******************
@@ -76,31 +77,6 @@ function insert_head () {
     <link rel="stylesheet" href="{$plugin_url}facebox/facebox.css" type="text/css" media="all" />
     <link rel="stylesheet" href="{$plugin_url}cfg-utility.css" type="text/css" media="all" />
     <link rel="stylesheet" href="{$plugin_url}exValidation/css/exvalidation.css" type="text/css" />
-    <style>
-    	.ui-multi-selected > *{
-    		border-color:#00F !important;
-    	}
-    	.datepicker_box{
-    		overflow:hidden;
-    	}
-    	.datepicker_box .datepicker{
-    		float:left;
-    		margin-right:10px;
-		}
-		.datepicker_box .datepicker_list{
-			height:182px;
-			width:300px;
-			margin:0;
-			overflow:auto;
-			background:#FFF;
-			padding:5px 0 5px 30px;
-			list-style:inside desc;
-		}
-		.datepicker_box .datepicker_list li{
-		}
-		.datepicker_box .datepicker_list li:last-child{
-		}
-    </style>
     <script type="text/javascript">
     var current_dir = "{$current_dir}";
     </script>

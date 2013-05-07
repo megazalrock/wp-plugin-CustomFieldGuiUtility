@@ -395,6 +395,4 @@ jQuery(function($){
 		}
 		return result;
 	}
-
-
 });

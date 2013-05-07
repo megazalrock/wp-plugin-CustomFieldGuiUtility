@@ -143,3 +143,23 @@ div.date inside div.dateBox{
 	
 }
 
+.ui-multi-selected > *{
+	border-color:#00F !important;
+}
+.datepicker_box{
+	overflow:hidden;
+}
+.datepicker_box .datepicker{
+	float:left;
+	margin-right:10px;
+}
+.datepicker_box .datepicker_list{
+	height:182px;
+	width:300px;
+	margin:0;
+	overflow:auto;
+	background:#FFF;
+	padding:5px 0 5px 30px;
+	list-style:inside desc;
+}
+
