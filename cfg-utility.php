@@ -797,8 +797,22 @@ function edit_meta_value($post_id) {
         	}else{
         		delete_post_meta($post_id, $meta_key);
         	}
-        	
-        }else{
+        
+        }else if($data_type == 'datearray'){
+        	$meta_value = isset($_REQUEST["$name"]) ? stripslashes(trim($_REQUEST["$name"])): '';
+        	if(isset($meta_value)){
+        		delete_post_meta($post_id,$meta_key);
+        		delete_post_meta($post_id,$meta_key.'_lastunixtime');
+
+        		add_post_meta($post_id,$meta_key,$meta_value);
+        		$meta_value_array = preg_split('/,/',$meta_value);
+        		$meta_value_lastunixtime = strtotime(end($meta_value_array));
+        		add_post_meta($post_id,$meta_key.'_lastunixtime',$meta_value_lastunixtime);
+        	}else{
+        		delete_post_meta($post_id,$meta_key);
+        		delete_post_meta($post_id,$meta_key.'_lastunixtime');
+        	}
+    	}else{
         	$meta_value = isset($_REQUEST["$name"]) ? stripslashes(trim($_REQUEST["$name"])): '';
         	
         	if (isset($meta_value) && !empty($meta_value)) {
@@ -811,8 +825,7 @@ function edit_meta_value($post_id) {
         				$data_type == 'select' ||
         				$data_type == 'table' ||
         				$data_type == 'textarea' ||
-        				$data_type == 'simpledate' ||
-        				$data_type == 'datearray') {
+        				$data_type == 'simpledate') {
         			add_post_meta($post_id, $meta_key, $meta_value);
         		} elseif ($data['type'] == 'checkbox') {
         			add_post_meta($post_id, $meta_key, 'true');
