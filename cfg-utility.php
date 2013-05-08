@@ -60,8 +60,8 @@ add_action('transition_post_status', 'edit_meta_value');
 wp_deregister_script('jquery');
 wp_enqueue_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js', array(), '1.9.1');
 wp_enqueue_script('jquery-ui',$plugin_url.'jquery-ui/js/jquery-ui-1.10.3.custom.js',array('jquery'),'1.10.3');
-wp_enqueue_script('jquery-validate.js',$plugin_url.'jquery.validate.min.js',array('jquery'),'1.11.1');
 wp_enqueue_script('jquery-migrate','http://code.jquery.com/jquery-migrate-1.1.1.min.js',array('jquery'),'1.1.1');
+wp_enqueue_script('modernizr_customed',$plugin_url.'modernizr.min.js',array(),'2.6.2');
 
 /******************
    Functions(main)
@@ -76,7 +76,6 @@ function insert_head () {
     <link rel="stylesheet" href="{$plugin_url}jquery-ui/css/smoothness/jquery-ui-1.10.3.custom.css" type="text/css" media="all" />
     <link rel="stylesheet" href="{$plugin_url}facebox/facebox.css" type="text/css" media="all" />
     <link rel="stylesheet" href="{$plugin_url}cfg-utility.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="{$plugin_url}exValidation/css/exvalidation.css" type="text/css" />
     <script type="text/javascript">
     var current_dir = "{$current_dir}";
     </script>
@@ -175,7 +174,8 @@ function insert_gui ($obj) {
             'values' => isset($data['value']) ? explode('#', $data['value']): '',
             'category' => isset($data['category']) ? explode(' ', $data['category']): '',
             'placeholder' => isset($data['placeholder']) ? $data['placeholder']: '',
-            'validation' => isset($data['validation']) ? $data['validation']: ''
+            'validation' => isset($data['validation']) ? $data['validation']: '',
+        	'img' => isset($data['img']) ? $data['img']: ''
         );
 
         /* 投稿タイプをチェックする */
@@ -252,16 +252,21 @@ function make_input ($name, $value, $size, $default, $input_type, $placeholder, 
 }
 
 /* カスタムフィールドの入力フォームを生成する */
-function make_element ($name, $type, $class, $inside, $sample, $fieldname, $must) {
+function make_element ($name, $type, $class, $inside, $sample, $fieldname, $must, $img = '') {
     $id = $name ? $name . '_box': '';
     $type = ($type == 'filefield') ? ' imagefield filefield' : ' ' . $type;
     $class = $class ? ' ' . $class : ' post';
     $must = $must ? ' must' : '';
     $caption = $sample ? '<p class="cfg_sample">' . $sample . '</p>' : '';
+    if($img !== ''){
+    	$img = '<p><img src="'.$img.'" /></p>';
+    }else{
+    	$img = '';
+    }
     $elm = <<< EOF
         <div class="postbox{$type}{$class}{$must}" id="{$id}">
             <h4 class="cf_title">{$fieldname}</h4>
-            <div class="inside">{$inside}{$caption}</div>
+            <div class="inside">{$caption}{$img}{$inside}</div>
         </div>
 EOF;
     return $elm;
@@ -299,7 +304,7 @@ function make_textform ($param) {
         $inside = <<< EOF
         <p class='cfg_input'>$input</p>
 EOF;
-        $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+        $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
     } elseif ($type == 'imagefield') {
         $inside = <<< EOF
         <p class="cfg_input">
@@ -311,7 +316,7 @@ EOF;
         </p>
         <p class="cfg_add_media_pointer">{$media_buttons}</P>
 EOF;
-        $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+        $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
     } elseif ($type == 'filefield') {
         $inside = <<< EOF
         <p class="cfg_input">
@@ -320,7 +325,7 @@ EOF;
         </p>
         <p class="cfg_add_media_pointer">{$media_buttons}</P>
 EOF;
-        $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+        $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
     }
     return $out;
 }
@@ -337,6 +342,7 @@ function make_checkbox ($param) {
     $fieldname  = $param['fieldname'];
     $must       = $param['must'];
     $validation = $param['validation'];
+	$img = $param['img'];
 
     $name = 'cfg_' . sanitize_name($meta_key);
     $meta_value = get_post_meta($post_id, $meta_key, true);
@@ -355,7 +361,7 @@ function make_checkbox ($param) {
             </label>
         </p>
 EOF;
-    $out = make_element ($name, 'checkboxs', $class, $inside, '', $fieldname, $must);
+    $out = make_element ($name, 'checkboxs', $class, $inside, '', $fieldname, $must,$img);
     return $out;
 }
 
@@ -373,6 +379,7 @@ function make_multi_checkbox ($param) {
     $value      = '';
     $values     = $param['values'];
     $validation = $param['validation'];
+	$img = $param['img'];
 
     $name = 'cfg_' . sanitize_name($meta_key);
     $meta_value = get_post_meta($post_id, $meta_key, true);
@@ -400,7 +407,7 @@ EOF;
             <input class="data" id="{$name}_data" name="{$name}" value="{$value}" type="text" />
         </p>
 EOF;
-    $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+    $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
     return $out;
 }
 
@@ -417,6 +424,7 @@ function make_radio ($param) {
     $must       = $param['must'];
     $values     = $param['values'];
     $validation = $param['validation'];
+	$img = $param['img'];
 
     $name = 'cfg_' . sanitize_name($meta_key);
     $meta_value = get_post_meta($post_id, $meta_key, true);
@@ -443,7 +451,7 @@ EOF;
     }
     $inside = implode($item_array);
     $inside = '<div id="' . $id . '_radio_wrapper" class="radio_wrapper ' . $validation . '" style="display: inline;">' . $inside . '</div>';
-    $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+    $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
     return $out;
 }
 
@@ -460,6 +468,7 @@ function make_select($param) {
     $must       = $param['must'];
     $values     = $param['values'];
     $validation = $param['validation'];
+	$img = $param['img'];
 
     $name = 'cfg_' . sanitize_name($meta_key);
     $meta_value = get_post_meta($post_id, $meta_key, true);
@@ -483,7 +492,7 @@ EOF;
     }
     array_push($item_array, '</select>');
     $inside = implode($item_array);
-    $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+    $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
     return $out;
 }
 
@@ -501,6 +510,7 @@ function make_textarea($param) {
     $rows       = $param['rows'];
     $cols       = $param['cols'];
     $validation = $param['validation'];
+	$img = $param['img'];
 
     $name = 'cfg_' . sanitize_name($meta_key);
     $meta_value = get_post_meta($post_id, $meta_key, true);
@@ -513,7 +523,7 @@ function make_textarea($param) {
     $inside = <<< EOF
         <textarea class="data {$validation}" id="{$name}" name="{$name}" type="textfield" rows="{$rows}" cols="{$cols}">{$value}</textarea>
 EOF;
-    $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+    $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
     return $out;
 }
 
@@ -540,6 +550,7 @@ function make_table($param){
 	$rows       = $param['rows'];
 	$cols       = $param['cols'];
 	$validation = $param['validation'];
+	$img = $param['img'];
 	
 	$name = 'cfg_' . sanitize_name($meta_key);
 	$meta_value = get_post_meta($post_id, $meta_key, true);
@@ -562,7 +573,7 @@ function make_table($param){
     	<input type="hidden" class="tableValue" id="{$name}" name="{$name}" value="{$value}" data-imgpath="{$image_dir_path}" />
 EOF;
 	
-	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
 	return $out;
 }
 
@@ -582,6 +593,7 @@ function make_date($param){
 	$validation = $param['validation'];
     $size		= $param['size'];
     $halfsize	= $param['size']/2;
+	$img = $param['img'];
 
 	$name = 'cfg_' . sanitize_name($meta_key);
 	$meta_value = get_post_meta($post_id, $meta_key, true);
@@ -635,7 +647,7 @@ function make_date($param){
 		</div>
 EOF;
 
-	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
 	return $out;
 }
 
@@ -655,6 +667,7 @@ function make_simpledate($param){
 	$validation = $param['validation'];
 	$size		= $param['size'];
 	$halfsize	= $param['size']/2;
+	$img = $param['img'];
 	
 	$name = 'cfg_' . sanitize_name($meta_key);
 	$meta_value = get_post_meta($post_id, $meta_key, true);
@@ -663,11 +676,12 @@ function make_simpledate($param){
 		$default = '';
 	}
 
-	
+	$sampleDate = date('Y-m-d');
 	$inside = <<< EOF
-		<input type="date" size="{$size}" class="date" id="{$name}" name="{$name}" value="{$meta_value}" />
+		<p class="canUseTypeDate">入力形式：{$sampleDate}</p>
+		<input type="date" size="{$size}" class="date datepicker" id="{$name}" name="{$name}" value="{$meta_value}" />
 EOF;
-	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
 	return $out;
 };
 
@@ -687,6 +701,7 @@ function make_datearray($param){
 	$validation = $param['validation'];
 	$size		= $param['size'];
 	$halfsize	= $param['size']/2;
+	$img = $param['img'];
 
 	$name = 'cfg_' . sanitize_name($meta_key);
 	$meta_value = get_post_meta($post_id, $meta_key, true);
@@ -704,7 +719,7 @@ function make_datearray($param){
 			<input type="hidden" class="datearray_hidden" id="{$name}" name="{$name}" value="{$meta_value}">
 		</div>
 EOF;
-	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must);
+	$out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
 	return $out;
 };
 

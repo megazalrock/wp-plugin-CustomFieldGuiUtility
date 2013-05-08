@@ -338,7 +338,17 @@ jQuery(function($){
 		});
 	
 	//datepicker
-
+	
+	if(!Modernizr.inputtypes.date){
+		$('input[type=date]')
+			.attr({
+				type:'text'
+			})
+			.datepicker({
+				dateFormat:'yy-mm-dd'
+			});
+	}
+	
 
 	$('div.datepicker_box')
 		.each(function(){
