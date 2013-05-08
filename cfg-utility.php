@@ -258,15 +258,15 @@ function make_element ($name, $type, $class, $inside, $sample, $fieldname, $must
     $class = $class ? ' ' . $class : ' post';
     $must = $must ? ' must' : '';
     $caption = $sample ? '<p class="cfg_sample">' . $sample . '</p>' : '';
-    if($img !== ''){
-    	$img = '<p><img src="'.$img.'" /></p>';
+    if(!empty($img)){
+    	$img = '<p style="clear:both;"><img src="'.$img.'" /></p>';
     }else{
     	$img = '';
     }
     $elm = <<< EOF
         <div class="postbox{$type}{$class}{$must}" id="{$id}">
             <h4 class="cf_title">{$fieldname}</h4>
-            <div class="inside">{$caption}{$img}{$inside}</div>
+            <div class="inside">{$caption}{$inside}{$img}</div>
         </div>
 EOF;
     return $elm;
