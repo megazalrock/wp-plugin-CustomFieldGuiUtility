@@ -386,7 +386,6 @@ jQuery(function($){
 						refreshList();
 					}
 				});
-			
 			function refreshList(){
 				$list.empty();
 				var i = 0,len = selectedDateArray.length;
@@ -396,8 +395,71 @@ jQuery(function($){
 				}
 				$input.val(selectedDateArray.join(','));
 			}
-			
 		});
+
+	//簡易必須項目のチェック
+	var $targets = $('#cfg_utility div.postbox.must').filter(function(){
+		var $self = $(this);
+		if($self.hasClass('textarea') ||
+			$self.hasClass('textfield') ||
+			$self.hasClass('imagefield') ||
+			$self.hasClass('table') ||
+			$self.hasClass('datearray') ||
+			$self.hasClass('simpledate')
+		){
+			return $self;
+		}
+	});
+
+	$('#publish')
+		.click(function(e){
+			e.preventDefault();
+			var $self = $(this);
+			var errorNum = checkTargets();
+			if(errorNum === 0){
+				document.post.submit();
+			}else{
+				setTimeout(function(){
+					var $majorPublishingActions = $('#major-publishing-actions');
+					$self
+						.removeClass('button-primary-disabled');
+					$self
+						.parent()
+						.find('span.spinner')
+							.hide();
+					if($majorPublishingActions.children('span.error').length === 0){
+						$majorPublishingActions
+							.prepend('<span id="error_button_side_messeage" class="error">入力のない必須項目があります。</span>');
+					}
+				},100);
+			}
+		});
+
+	function checkTargets(){
+		var errorNum = 0;
+		$targets
+			.each(function(){
+				var $self = $(this);
+				var $text = $self.find('input[name],textarea[name]');
+				var val = $text.val();
+				//val = val.replace(/\s/g,val);
+				if(val.length <= 0){
+					errorNum += 1;
+					showError($self);
+				}
+			});
+		return errorNum;
+	}
+	function showError($postbox){
+		var $title = $postbox.find('h4.cf_title');
+		if($title.children('span.error').length === 0){
+			$title
+				.append('<span id="error_'+$postbox.attr('id')+'" class="error">必ず入力して下さい。</span>');
+
+		}
+	}
+
+
 	function padNumber(num){
 		var result = num;
 		if (num < 10){

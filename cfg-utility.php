@@ -155,7 +155,7 @@ function insert_gui ($obj) {
 
     /* nonceを設定する */
     $out = '<input type="hidden" name="custom-field-gui-verify-key" id="custom-field-gui-verify-key" value="' . wp_create_nonce('custom-field-gui') . '" />';
-
+	$out .= '<p><span class="musticon">*</span>が付いているものは必須項目です。</p>';
     foreach ($fields as $meta_key => $data) {
 
         /* パラメーター */
@@ -257,6 +257,7 @@ function make_element ($name, $type, $class, $inside, $sample, $fieldname, $must
     $type = ($type == 'filefield') ? ' imagefield filefield' : ' ' . $type;
     $class = $class ? ' ' . $class : ' post';
     $must = $must ? ' must' : '';
+    $must_html = $must ? '<span class="musticon">*</span>' : '';
     $caption = $sample ? '<p class="cfg_sample">' . $sample . '</p>' : '';
     if(!empty($img)){
     	$img = '<p style="clear:both;"><img src="'.$img.'" /></p>';
@@ -265,7 +266,7 @@ function make_element ($name, $type, $class, $inside, $sample, $fieldname, $must
     }
     $elm = <<< EOF
         <div class="postbox{$type}{$class}{$must}" id="{$id}">
-            <h4 class="cf_title">{$fieldname}</h4>
+            <h4 class="cf_title">{$must_html}{$fieldname}</h4>
             <div class="inside">{$caption}{$inside}{$img}</div>
         </div>
 EOF;

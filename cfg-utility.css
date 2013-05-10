@@ -163,3 +163,19 @@ div.date inside div.dateBox{
 	list-style:inside desc;
 }
 
+.musticon,
+.error{
+	color:#F00;
+}
+.postbox .error{
+	display:inline-block;
+	padding-left:1em;
+	
+}
+#major-publishing-actions .error{
+	display:block;
+	padding:0.5em 0;
+	font-size:16px;
+	text-align:center;
+}
+
