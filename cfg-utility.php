@@ -261,7 +261,7 @@ function make_element ($name, $type, $class, $inside, $sample, $fieldname, $must
     $must_html = $must ? '<span class="musticon">*</span>' : '';
     $caption = $sample ? '<p class="cfg_sample">' . $sample . '</p>' : '';
     if(!empty($img)){
-    	$img = '<p style="clear:both;"><img src="'.$img.'" /></p>';
+    	$img = '<p class="descriptionImage" style="clear:both;"><img src="'.$img.'" /></p>';
     }else{
     	$img = '';
     }
@@ -288,6 +288,7 @@ function make_textform ($param) {
     $must        = $param['must'];
     $placeholder = $param['placeholder'];
     $validation  = $param['validation'];
+    $img = $param['img'];
 
     $name = 'cfg_' . sanitize_name($meta_key);
     $meta_value = get_post_meta($post_id, $meta_key, true);
