@@ -261,7 +261,7 @@ function make_element ($name, $type, $class, $inside, $sample, $fieldname, $must
     $must_html = $must ? '<span class="musticon">*</span>' : '';
     $caption = $sample ? '<p class="cfg_sample">' . $sample . '</p>' : '';
     if(!empty($img)){
-    	$img = '<p class="descriptionImage" style="clear:both;"><img src="'.$img.'" /></p>';
+    	$img = '<p class="descriptionImage"><a href="'.$img.'"><img src="'.$img.'" /></a></p>';
     }else{
     	$img = '';
     }

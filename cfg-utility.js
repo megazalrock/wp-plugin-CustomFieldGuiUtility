@@ -267,7 +267,7 @@ jQuery(function($){
 	// フォーカスしたテキストフィールドの初期値を消す [end]
 
 	// for facebox.js
-	$("a[rel*=facebox]").facebox();
+	$("a[rel*=facebox],p.descriptionImage > a").facebox();
 	
 	$('div.postbox.table > div.inside')
 	  .each(function(){
