@@ -317,7 +317,7 @@ EOF;
                 <a href="#" class="image" rel="facebox"></a>
             </span>
         </p>
-        <p class="cfg_add_media_pointer">{$media_buttons}</P>
+        <p class="cfg_add_media_pointer">{$media_buttons}</p>
 EOF;
         $out = make_element ($name, $type, $class, $inside, $sample, $fieldname, $must,$img);
     } elseif ($type == 'filefield') {
