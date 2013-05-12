@@ -61,7 +61,7 @@ div.postbox h4 {
 	border-bottom: 1px solid #DFDFDF;
 }
 div.imagefield div.inside {
-	height: 100px;
+	min-height: 100px;
 	position: relative;
 }
 div.imagefield div.inside button.cancel {
