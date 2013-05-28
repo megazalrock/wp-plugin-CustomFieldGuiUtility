@@ -57,8 +57,8 @@ add_action('publish_post', 'edit_meta_value');
 add_action('transition_post_status', 'edit_meta_value');
 
 /* jQueryのバージョンを1.9に変更 */
-wp_deregister_script('jquery');
-wp_enqueue_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js', array(), '1.9.1');
+//wp_deregister_script('jquery');
+/*wp_enqueue_script('jquery-1.9', 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js', array(), '1.9.1');*/
 wp_enqueue_script('jquery-ui',$plugin_url.'jquery-ui/js/jquery-ui-1.10.3.custom.js',array('jquery'),'1.10.3');
 wp_enqueue_script('jquery-ui-datapicker-ja',$plugin_url.'jquery-ui/js/jquery.ui.datepicker-ja.js',array('jquery-ui'),'1.0.0');
 wp_enqueue_script('jquery-migrate','http://code.jquery.com/jquery-migrate-1.1.1.min.js',array('jquery'),'1.1.1');

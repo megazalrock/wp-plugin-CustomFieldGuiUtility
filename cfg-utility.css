@@ -172,11 +172,13 @@ div.date inside div.dateBox{
 	padding-left:1em;
 	
 }
-#major-publishing-actions .error{
+#misc-publishing-actions .error{
 	display:block;
 	padding:0.5em 0;
-	font-size:16px;
 	text-align:center;
+	margin: 0 auto;
+	border: none;
+	font-size: normal;
 }
 
 .descriptionImage{
@@ -193,6 +195,5 @@ div.date inside div.dateBox{
 	filter: alpha(opacity=70);
 	-ms-filter: "alpha(opacity=70)";
 }
-
 
 

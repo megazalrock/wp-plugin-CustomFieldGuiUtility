@@ -12,7 +12,6 @@
  * Facebox 1.2
  * exValidation 1.3.0  (c)5509 (http://5509.me/)
  */
-
 jQuery(function($){
 
 	// 新しいメディアアップローダー対応 <START>
@@ -393,7 +392,9 @@ jQuery(function($){
 					$list
 						.append('<li>'+ selectedDateArray[i] +'</li>');
 				}
-				$input.val(selectedDateArray.join(','));
+				$input
+					.val(selectedDateArray.join(','))
+					.trigger('change');
 			}
 		});
 
@@ -411,28 +412,30 @@ jQuery(function($){
 		}
 	});
 
-	$('#publish')
-		.click(function(e){
-			e.preventDefault();
-			var $self = $(this);
-			var errorNum = checkTargets();
-			if(errorNum === 0){
-				document.post.submit();
+	var $publish = $('#publish');
+	var $miscPublishingActions = $('#misc-publishing-actions');
+
+	$targets
+		.on('focusout select blur focus change keyup',function(){
+			if(checkTargets() === 0){
+				$publish
+					.prop('disabled',false);
+				$miscPublishingActions
+					.children('div.error')
+						.remove();
 			}else{
-				setTimeout(function(){
-					var $majorPublishingActions = $('#major-publishing-actions');
-					$self
-						.removeClass('button-primary-disabled');
-					$self
-						.parent()
-						.find('span.spinner')
-							.hide();
-					if($majorPublishingActions.children('span.error').length === 0){
-						$majorPublishingActions
-							.prepend('<span id="error_button_side_messeage" class="error">入力のない必須項目があります。</span>');
-					}
-				},100);
+				$publish
+					.prop('disabled',true);
+				if($miscPublishingActions.children('div.error').length === 0){
+					$miscPublishingActions
+						.append('<div class="error">未入力の必須項目があります！</div>');
+				}
 			}
+		});
+	$(window)
+		.on('load',function(e){
+			$targets
+				.trigger('blur');
 		});
 
 	function checkTargets(){
@@ -446,6 +449,8 @@ jQuery(function($){
 				if(val.length <= 0){
 					errorNum += 1;
 					showError($self);
+				}else{
+					removeError($self);
 				}
 			});
 		return errorNum;
@@ -455,8 +460,13 @@ jQuery(function($){
 		if($title.children('span.error').length === 0){
 			$title
 				.append('<span id="error_'+$postbox.attr('id')+'" class="error">必ず入力して下さい。</span>');
-
 		}
+	}
+	function removeError($postbox){
+		var $title = $postbox.find('h4.cf_title');
+		$title
+			.children('span.error')
+				.remove();
 	}
 
 
